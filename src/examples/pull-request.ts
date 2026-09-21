@@ -1,8 +1,8 @@
 import { noul, type TypeSafeClient } from "@typesafe-ai/sdk";
 
-export async function labelPullRequest(client: TypeSafeClient, title: string, diff: string) {
-  const request = {
-    model: client.defaultModel,
+export function pullRequestRequest(model: string, title: string, diff: string) {
+  return {
+    model,
     state: { title, diff },
     questions: {
       breakingChange: noul("Does `diff` break the existing public API contract?", {
@@ -11,7 +11,10 @@ export async function labelPullRequest(client: TypeSafeClient, title: string, di
       }),
     },
   };
+}
 
+export async function labelPullRequest(client: TypeSafeClient, title: string, diff: string) {
+  const request = pullRequestRequest(client.defaultModel, title, diff);
   const response = await client.systemOne(request);
   return { request, response };
 }

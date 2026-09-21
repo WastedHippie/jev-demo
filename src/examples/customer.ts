@@ -1,8 +1,8 @@
 import { choice, type TypeSafeClient } from "@typesafe-ai/sdk";
 
-export async function labelCustomer(client: TypeSafeClient, interactions: string) {
-  const request = {
-    model: client.defaultModel,
+export function customerRequest(model: string, interactions: string) {
+  return {
+    model,
     state: { interactions },
     questions: {
       reason: choice("What is the customer's main reason for contacting the bank?", {
@@ -13,7 +13,10 @@ export async function labelCustomer(client: TypeSafeClient, interactions: string
       }),
     },
   };
+}
 
+export async function labelCustomer(client: TypeSafeClient, interactions: string) {
+  const request = customerRequest(client.defaultModel, interactions);
   const response = await client.systemOne(request);
   return { request, response };
 }
