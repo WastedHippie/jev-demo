@@ -2,337 +2,280 @@
   {
     "input": {
       "demo": "customer",
-      "interactions": "Monday, 09:10 | Customer\nI can't sign into the mobile app. It says my device isn't recognised.\n\nMonday, 09:18 | Support\nPlease reinstall the app and register your device again.\n\nTuesday, 12:30 | Customer\nI've reinstalled twice and tried registering again. Still the same error. I need to make a transfer today.\n\nWednesday, 08:45 | Customer\nThis is my third time contacting you about this. I'm still locked out. Can someone please call me instead of sending the same steps?"
+      "interactions": "Customer: I left my debit card in a taxi and can't get it back.\nAgent: Have you frozen the card?\nCustomer: Yes. I need a replacement sent to my home."
     },
     "result": {
       "demo": "customer",
-      "response": {
+      "request": {
         "model": "jev-1.13.0",
-        "answers": {
-          "owner": {
+        "state": {
+          "interactions": "Customer: I left my debit card in a taxi and can't get it back.\nAgent: Have you frozen the card?\nCustomer: Yes. I need a replacement sent to my home."
+        },
+        "questions": {
+          "reason": {
             "type": "choice",
-            "choice": "digital_banking",
-            "confidence": 1,
-            "probabilities": {
-              "digital_banking": 1,
-              "account_support": 0,
-              "payments": 0,
-              "none": 0
-            }
-          },
-          "unresolved": {
-            "type": "noul",
-            "noul": 0.98
-          },
-          "repeatContact": {
-            "type": "noul",
-            "noul": 0.99
-          },
-          "wantsHuman": {
-            "type": "noul",
-            "noul": 0.97
-          },
-          "friction": {
-            "type": "score",
-            "score": 3,
-            "confidence": 1,
-            "legend": {
-              "0": "A routine interaction with no problem to resolve",
-              "1": "A first support contact or one straightforward step, without repeated failed attempts",
-              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
-              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
-            },
-            "probabilities": {
-              "0": 0,
-              "1": 0,
-              "2": 0,
-              "3": 1
+            "instructions": "What is the customer's main reason for contacting the bank?",
+            "criteria": {
+              "card_replacement": "Getting a replacement for a lost, stolen, damaged, or expired card",
+              "payment_query": "Asking about a charge, card transaction, or transfer",
+              "online_banking": "Getting help accessing the banking app or website",
+              "other": "A different reason, or no clear reason is given"
             }
           }
-        },
-        "usage": {
-          "input_tokens": 716,
-          "output_tokens": 126
         }
       },
-      "source": "recorded",
-      "elapsedMs": 904,
-      "capturedAt": "2026-09-21T00:10:10.198Z"
-    }
-  },
-  {
-    "input": {
-      "demo": "customer",
-      "interactions": "Monday, 09:10 | Customer\nI can't sign into the mobile app. Can someone call me?\n\nTuesday, 12:30 | Customer\nI'm following up. Reinstalling didn't fix it.\n\nTuesday, 14:00 | Support\nI called the customer, reset their device registration and stayed on the phone while they signed in successfully.\n\nTuesday, 14:10 | Customer\nThanks for the call! I'm back in and the transfer went through. All sorted now."
-    },
-    "result": {
-      "demo": "customer",
       "response": {
         "model": "jev-1.13.0",
         "answers": {
-          "owner": {
+          "reason": {
             "type": "choice",
-            "choice": "none",
-            "confidence": 0.98,
+            "choice": "card_replacement",
+            "confidence": 1,
             "probabilities": {
-              "digital_banking": 0.02,
-              "account_support": 0,
-              "payments": 0,
-              "none": 0.98
-            }
-          },
-          "unresolved": {
-            "type": "noul",
-            "noul": 0.02
-          },
-          "repeatContact": {
-            "type": "noul",
-            "noul": 0.98
-          },
-          "wantsHuman": {
-            "type": "noul",
-            "noul": 0.04
-          },
-          "friction": {
-            "type": "score",
-            "score": 1.99,
-            "confidence": 0.99,
-            "legend": {
-              "0": "A routine interaction with no problem to resolve",
-              "1": "A first support contact or one straightforward step, without repeated failed attempts",
-              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
-              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
-            },
-            "probabilities": {
-              "0": 0,
-              "1": 0.01,
-              "2": 0.99,
-              "3": 0
+              "other": 0,
+              "card_replacement": 1,
+              "payment_query": 0,
+              "online_banking": 0
             }
           }
         },
         "usage": {
-          "input_tokens": 704,
-          "output_tokens": 123
+          "input_tokens": 428,
+          "output_tokens": 55
         }
       },
       "source": "recorded",
-      "elapsedMs": 317,
-      "capturedAt": "2026-09-21T00:10:10.515Z"
+      "elapsedMs": 879,
+      "capturedAt": "2026-09-21T03:56:33.018Z"
     }
   },
   {
     "input": {
       "demo": "customer",
-      "interactions": "Monday | Customer\nWhere can I download last month's statement?\n\nMonday | Support\nOpen Accounts, then Statements, and choose the month.\n\nMonday | Customer\nFound it, thanks.\n\nFriday | Customer\nA new question: I see the same card purchase twice in my settled transactions. Could you check the duplicate charge?"
+      "interactions": "Customer: The restaurant seems to have charged me twice for last night's dinner.\nAgent: Are both transactions settled, or is one still pending?\nCustomer: Both have settled. Could you look into the duplicate?"
     },
     "result": {
       "demo": "customer",
-      "response": {
+      "request": {
         "model": "jev-1.13.0",
-        "answers": {
-          "owner": {
+        "state": {
+          "interactions": "Customer: The restaurant seems to have charged me twice for last night's dinner.\nAgent: Are both transactions settled, or is one still pending?\nCustomer: Both have settled. Could you look into the duplicate?"
+        },
+        "questions": {
+          "reason": {
             "type": "choice",
-            "choice": "payments",
+            "instructions": "What is the customer's main reason for contacting the bank?",
+            "criteria": {
+              "card_replacement": "Getting a replacement for a lost, stolen, damaged, or expired card",
+              "payment_query": "Asking about a charge, card transaction, or transfer",
+              "online_banking": "Getting help accessing the banking app or website",
+              "other": "A different reason, or no clear reason is given"
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "reason": {
+            "type": "choice",
+            "choice": "payment_query",
             "confidence": 1,
             "probabilities": {
-              "payments": 1,
-              "digital_banking": 0,
-              "account_support": 0,
-              "none": 0
-            }
-          },
-          "unresolved": {
-            "type": "noul",
-            "noul": 0.95
-          },
-          "repeatContact": {
-            "type": "noul",
-            "noul": 0.06
-          },
-          "wantsHuman": {
-            "type": "noul",
-            "noul": 0.03
-          },
-          "friction": {
-            "type": "score",
-            "score": 1.03,
-            "confidence": 0.94,
-            "legend": {
-              "0": "A routine interaction with no problem to resolve",
-              "1": "A first support contact or one straightforward step, without repeated failed attempts",
-              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
-              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
-            },
-            "probabilities": {
-              "0": 0.02,
-              "1": 0.94,
-              "2": 0.03,
-              "3": 0.01
+              "payment_query": 1,
+              "online_banking": 0,
+              "other": 0,
+              "card_replacement": 0
             }
           }
         },
         "usage": {
-          "input_tokens": 657,
-          "output_tokens": 123
+          "input_tokens": 432,
+          "output_tokens": 53
         }
       },
       "source": "recorded",
-      "elapsedMs": 290,
-      "capturedAt": "2026-09-21T00:10:10.805Z"
+      "elapsedMs": 335,
+      "capturedAt": "2026-09-21T03:56:33.353Z"
     }
   },
   {
     "input": {
-      "demo": "pull-request",
-      "title": "Small cleanup of the transfers endpoint",
-      "diff": "diff --git a/src/api/transfers.ts b/src/api/transfers.ts\n--- a/src/api/transfers.ts\n+++ b/src/api/transfers.ts\n@@ -12,6 +12,5 @@ export function transferResponse(transfer: Transfer) {\n   return {\n     id: transfer.id,\n-    amount: transfer.amountInCents,\n-    currency: transfer.currency,\n+    amount: { value: transfer.amountInCents, currency: transfer.currency },\n   };\n }"
+      "demo": "customer",
+      "interactions": "Customer: I got a new phone and the app won't let me sign in.\nAgent: What happens when you try?\nCustomer: It asks me to approve the login on my old device, which I no longer have."
     },
     "result": {
-      "demo": "pull-request",
-      "response": {
+      "demo": "customer",
+      "request": {
         "model": "jev-1.13.0",
-        "answers": {
-          "breaking": {
-            "type": "noul",
-            "noul": 0.95
-          },
-          "security": {
-            "type": "noul",
-            "noul": 0.05
-          },
-          "migration": {
-            "type": "noul",
-            "noul": 0.06
-          },
-          "blastRadius": {
-            "type": "score",
-            "score": 2,
-            "confidence": 0.99,
-            "legend": {
-              "0": "No executable behavior changes; documentation, comments, or tests only",
-              "1": "A local optional feature or isolated presentation behavior",
-              "2": "A core feature or public endpoint used by a subset of workflows",
-              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
-            },
-            "probabilities": {
-              "0": 0,
-              "1": 0,
-              "2": 0.99,
-              "3": 0.01
+        "state": {
+          "interactions": "Customer: I got a new phone and the app won't let me sign in.\nAgent: What happens when you try?\nCustomer: It asks me to approve the login on my old device, which I no longer have."
+        },
+        "questions": {
+          "reason": {
+            "type": "choice",
+            "instructions": "What is the customer's main reason for contacting the bank?",
+            "criteria": {
+              "card_replacement": "Getting a replacement for a lost, stolen, damaged, or expired card",
+              "payment_query": "Asking about a charge, card transaction, or transfer",
+              "online_banking": "Getting help accessing the banking app or website",
+              "other": "A different reason, or no clear reason is given"
             }
           }
-        },
-        "usage": {
-          "input_tokens": 668,
-          "output_tokens": 67
         }
       },
-      "source": "recorded",
-      "elapsedMs": 391,
-      "capturedAt": "2026-09-21T00:10:11.197Z"
-    }
-  },
-  {
-    "input": {
-      "demo": "pull-request",
-      "title": "Simplify account access checks",
-      "diff": "diff --git a/src/middleware/authorize.ts b/src/middleware/authorize.ts\n--- a/src/middleware/authorize.ts\n+++ b/src/middleware/authorize.ts\n@@ -4,5 +4,4 @@ export async function authorizeAccount(req: Request) {\n   const session = await requireSession(req);\n-  const membership = await findAccountMember(req.params.accountId, session.userId);\n-  if (!membership) throw new ForbiddenError();\n+  if (!session.userId) throw new ForbiddenError();\n   return session;\n }\ndiff --git a/migrations/042_members.sql b/migrations/042_members.sql\nnew file mode 100644\n--- /dev/null\n+++ b/migrations/042_members.sql\n@@ -0,0 +1,2 @@\n+ALTER TABLE account_members ADD COLUMN role TEXT NOT NULL DEFAULT 'viewer';\n+UPDATE account_members SET role = 'owner' WHERE is_owner = TRUE;"
-    },
-    "result": {
-      "demo": "pull-request",
       "response": {
         "model": "jev-1.13.0",
         "answers": {
-          "breaking": {
-            "type": "noul",
-            "noul": 0.54
-          },
-          "security": {
-            "type": "noul",
-            "noul": 0.96
-          },
-          "migration": {
-            "type": "noul",
-            "noul": 0.97
-          },
-          "blastRadius": {
-            "type": "score",
-            "score": 2.99,
-            "confidence": 0.99,
-            "legend": {
-              "0": "No executable behavior changes; documentation, comments, or tests only",
-              "1": "A local optional feature or isolated presentation behavior",
-              "2": "A core feature or public endpoint used by a subset of workflows",
-              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
-            },
-            "probabilities": {
-              "0": 0,
-              "1": 0,
-              "2": 0.01,
-              "3": 0.99
-            }
-          }
-        },
-        "usage": {
-          "input_tokens": 797,
-          "output_tokens": 67
-        }
-      },
-      "source": "recorded",
-      "elapsedMs": 328,
-      "capturedAt": "2026-09-21T00:10:11.525Z"
-    }
-  },
-  {
-    "input": {
-      "demo": "pull-request",
-      "title": "Document breaking changes, security and database migrations",
-      "diff": "diff --git a/docs/contributing.md b/docs/contributing.md\n--- a/docs/contributing.md\n+++ b/docs/contributing.md\n@@ -8,1 +8,7 @@ Pull request guidelines\n Keep changes focused.\n+\n+## Review checklist\n+Mention any breaking changes in the PR description.\n+Ask the security team to review authentication changes.\n+Include a rollback plan for database migrations.\n+Add a test for the behavior you are changing."
-    },
-    "result": {
-      "demo": "pull-request",
-      "response": {
-        "model": "jev-1.13.0",
-        "answers": {
-          "breaking": {
-            "type": "noul",
-            "noul": 0.02
-          },
-          "security": {
-            "type": "noul",
-            "noul": 0.02
-          },
-          "migration": {
-            "type": "noul",
-            "noul": 0.03
-          },
-          "blastRadius": {
-            "type": "score",
-            "score": 0,
+          "reason": {
+            "type": "choice",
+            "choice": "online_banking",
             "confidence": 1,
-            "legend": {
-              "0": "No executable behavior changes; documentation, comments, or tests only",
-              "1": "A local optional feature or isolated presentation behavior",
-              "2": "A core feature or public endpoint used by a subset of workflows",
-              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
-            },
             "probabilities": {
-              "0": 1,
-              "1": 0,
-              "2": 0,
-              "3": 0
+              "other": 0,
+              "card_replacement": 0,
+              "online_banking": 1,
+              "payment_query": 0
             }
           }
         },
         "usage": {
-          "input_tokens": 659,
-          "output_tokens": 67
+          "input_tokens": 435,
+          "output_tokens": 55
         }
       },
       "source": "recorded",
-      "elapsedMs": 455,
-      "capturedAt": "2026-09-21T00:10:11.979Z"
+      "elapsedMs": 299,
+      "capturedAt": "2026-09-21T03:56:33.653Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Rename the user name field",
+      "diff": "diff --git a/src/api/users.ts b/src/api/users.ts\n--- a/src/api/users.ts\n+++ b/src/api/users.ts\n@@ -1,3 +1,3 @@\n // GET /api/users/:id\n export function userResponse(user: User) {\n-  return { id: user.id, name: user.name };\n+  return { id: user.id, fullName: user.name };"
+    },
+    "result": {
+      "demo": "pull-request",
+      "request": {
+        "model": "jev-1.13.0",
+        "state": {
+          "title": "Rename the user name field",
+          "diff": "diff --git a/src/api/users.ts b/src/api/users.ts\n--- a/src/api/users.ts\n+++ b/src/api/users.ts\n@@ -1,3 +1,3 @@\n // GET /api/users/:id\n export function userResponse(user: User) {\n-  return { id: user.id, name: user.name };\n+  return { id: user.id, fullName: user.name };"
+        },
+        "questions": {
+          "breakingChange": {
+            "type": "noul",
+            "instructions": "Does `diff` break the existing public API contract?",
+            "criteria": {
+              "true": "Removes or incompatibly changes an endpoint, response field, or accepted input",
+              "false": "Adds compatible optional data, refactors internally, or changes only documentation"
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breakingChange": {
+            "type": "noul",
+            "noul": 0.94
+          }
+        },
+        "usage": {
+          "input_tokens": 427,
+          "output_tokens": 24
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 335,
+      "capturedAt": "2026-09-21T03:56:33.988Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Include an optional avatar URL in user responses",
+      "diff": "diff --git a/src/api/users.ts b/src/api/users.ts\n--- a/src/api/users.ts\n+++ b/src/api/users.ts\n@@ -1,3 +1,3 @@\n // GET /api/users/:id\n export function userResponse(user: User) {\n-  return { id: user.id, name: user.name };\n+  return { id: user.id, name: user.name, avatarUrl: user.avatarUrl ?? null };"
+    },
+    "result": {
+      "demo": "pull-request",
+      "request": {
+        "model": "jev-1.13.0",
+        "state": {
+          "title": "Include an optional avatar URL in user responses",
+          "diff": "diff --git a/src/api/users.ts b/src/api/users.ts\n--- a/src/api/users.ts\n+++ b/src/api/users.ts\n@@ -1,3 +1,3 @@\n // GET /api/users/:id\n export function userResponse(user: User) {\n-  return { id: user.id, name: user.name };\n+  return { id: user.id, name: user.name, avatarUrl: user.avatarUrl ?? null };"
+        },
+        "questions": {
+          "breakingChange": {
+            "type": "noul",
+            "instructions": "Does `diff` break the existing public API contract?",
+            "criteria": {
+              "true": "Removes or incompatibly changes an endpoint, response field, or accepted input",
+              "false": "Adds compatible optional data, refactors internally, or changes only documentation"
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breakingChange": {
+            "type": "noul",
+            "noul": 0.08
+          }
+        },
+        "usage": {
+          "input_tokens": 440,
+          "output_tokens": 24
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 329,
+      "capturedAt": "2026-09-21T03:56:34.317Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Explain how to announce breaking changes",
+      "diff": "diff --git a/docs/contributing.md b/docs/contributing.md\n--- a/docs/contributing.md\n+++ b/docs/contributing.md\n@@ -1 +1,2 @@\n # Contributing\n+Document breaking API changes in the release notes before merging."
+    },
+    "result": {
+      "demo": "pull-request",
+      "request": {
+        "model": "jev-1.13.0",
+        "state": {
+          "title": "Explain how to announce breaking changes",
+          "diff": "diff --git a/docs/contributing.md b/docs/contributing.md\n--- a/docs/contributing.md\n+++ b/docs/contributing.md\n@@ -1 +1,2 @@\n # Contributing\n+Document breaking API changes in the release notes before merging."
+        },
+        "questions": {
+          "breakingChange": {
+            "type": "noul",
+            "instructions": "Does `diff` break the existing public API contract?",
+            "criteria": {
+              "true": "Removes or incompatibly changes an endpoint, response field, or accepted input",
+              "false": "Adds compatible optional data, refactors internally, or changes only documentation"
+            }
+          }
+        }
+      },
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breakingChange": {
+            "type": "noul",
+            "noul": 0.01
+          }
+        },
+        "usage": {
+          "input_tokens": 402,
+          "output_tokens": 24
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 334,
+      "capturedAt": "2026-09-21T03:56:34.652Z"
     }
   }
 ]

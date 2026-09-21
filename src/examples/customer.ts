@@ -1,43 +1,21 @@
-import { choice, noul, score, type TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice, type TypeSafeClient } from "@typesafe-ai/sdk";
 
-export function labelCustomer(client: TypeSafeClient, interactions: string) {
-  // One request. Each question independently reads the same interaction history.
-  return client.systemOne({
+export async function labelCustomer(client: TypeSafeClient, interactions: string) {
+  const request = {
+    model: client.defaultModel,
     state: { interactions },
     questions: {
-      owner: choice("Which team owns the latest unresolved issue in `interactions`?", {
-        digital_banking: "Mobile app, online banking, login, or authentication problems",
-        payments: "Card transactions, transfers, payment delays, or duplicate charges",
-        account_support: "Account details, statements, fees, or general account servicing",
-        none: "No unresolved issue, or none of these teams fits",
+      reason: choice("What is the customer's main reason for contacting the bank?", {
+        card_replacement: "Getting a replacement for a lost, stolen, damaged, or expired card",
+        payment_query: "Asking about a charge, card transaction, or transfer",
+        online_banking: "Getting help accessing the banking app or website",
+        other: "A different reason, or no clear reason is given",
       }),
-      unresolved: noul(
-        "Is the customer's latest issue still unresolved at the end of `interactions`?",
-      ),
-      repeatContact: noul(
-        "Has the customer contacted support more than once about the SAME issue?",
-      ),
-      wantsHuman: noul("Is there an outstanding request to speak to a human in `interactions`?", {
-        true: "The customer requests a person, and that request has not yet been fulfilled",
-        false: "No request for a person, or the requested human contact already happened",
-      }),
-      friction: score("How much effort has resolving the latest issue taken this customer?", [
-        "A routine interaction with no problem to resolve",
-        "A first support contact or one straightforward step, without repeated failed attempts",
-        "Several contacts or troubleshooting steps, with progress or a usable workaround",
-        "Repeated contacts and unsuccessful steps, with the customer still blocked",
-      ]),
     },
-  });
+  };
+
+  const response = await client.systemOne(request);
+  return { request, response };
 }
 
-export type CustomerResponse = Awaited<ReturnType<typeof labelCustomer>>;
-
-export function customerLabels(answers: CustomerResponse["answers"], threshold = 0.8) {
-  // Probabilities become labels through a policy we can change without another API call.
-  return [
-    { label: "Unresolved issue", probability: answers.unresolved.noul },
-    { label: "Repeat contact", probability: answers.repeatContact.noul },
-    { label: "Human requested", probability: answers.wantsHuman.noul },
-  ].filter(({ probability }) => probability >= threshold);
-}
+export type CustomerResponse = Awaited<ReturnType<typeof labelCustomer>>["response"];

@@ -1,20 +1,11 @@
 # Jev demo
 
-A 15-minute TypeScript and Bun demo for engineers: turn fictional bank support logs and pull request diffs into typed judgments, then apply a few ordinary code rules.
+A 15-minute TypeScript and Bun demo for engineers. Two small examples each ask **one question**:
 
-The main example labels current **service needs** from interaction history. The second applies the same pattern to PR labels. The model supplies judgments; TypeScript decides which labels to display.
+- **Customer label:** choose the reason for a fictional customer's contact.
+- **PR label:** judge whether a diff breaks a public API contract.
 
-## How is this different from a generative LLM?
-
-Jev is a specialized language model for focused decisions, called a **System One** model by TypeSafe. Its documented training focus is calibrated decisions. Compare its programming interface and intended jobs:
-
-| | Jev | A generative LLM |
-| --- | --- | --- |
-| Typical job | Choose an option, judge a condition, or score a defined dimension. | Generate content, explain, or reason through open-ended work. |
-| Interface | `Choice`, `Noul`, and `Score`, with answer probabilities. | Generated content; many APIs also support structured output and tools. |
-| Composition | Batch independent questions, then combine their answers in code. | Can also be orchestrated by code and return typed, constrained values. |
-
-The distinction is specialization and API contract. A general LLM can classify and provide probability information too. This demo shows Jev's decision interface; it does not benchmark it against another model or establish a cost or latency advantage. Use an appropriate generative model when the output needs an explanation or open-ended reasoning. See [System One](https://docs.typesafe.ai/concepts/system-one).
+The workbench keeps the input, actual request, response, and source available to inspect.
 
 ## Run it
 
@@ -23,70 +14,78 @@ Install [Bun](https://bun.sh), then on a fresh clone:
 ```sh
 bun install
 cp .env.example .env
-# Set TYPESAFE_API_KEY in .env if you want live requests.
+# Set TYPESAFE_API_KEY in .env for live requests.
 bun dev
 ```
 
-Open [localhost:3000](http://localhost:3000). Bun loads `.env` automatically; the SDK reads the key on the server. Restart the server after changing the key. `.env` is ignored by Git. `TYPESAFE_MODEL` defaults to `jev-1.13.0`.
+Open [localhost:3000](http://localhost:3000). Bun loads `.env` automatically; the SDK reads the key on the server. Restart after changing the key. `.env` is ignored by Git. `TYPESAFE_MODEL` defaults to `jev-1.13.0`.
 
-**Recorded** mode uses saved responses from actual API calls and works without a key. The result identifies its mode, model, and capture time. Switching to recorded mode is explicit; a failed live call never silently becomes a recording. Recorded results cover the included presets.
+Choose a scenario, then **Run example**. Use **Demo** for the input and result, **Request & response** for the JSON, **Source** for the example code, and **Jev vs LLM** for the comparison.
 
-Start with **Still blocked**, then **Resolved since then**. Follow with the PR preset **Small cleanup?**. See the [presenter guide](docs/presenter.md) for the full 15-minute walkthrough.
+**Recorded** mode uses saved results from actual API calls and works without a key. Each result identifies its mode, model, and capture time. There is no automatic fallback from a failed live call to a recording. Recordings cover the included scenarios; edited inputs require Live mode.
 
-## What to demonstrate
+Start with **Replace a card**, then **Rename a response field**. The [presenter guide](docs/presenter.md) covers the 15-minute walkthrough.
 
-| Example | The interesting part |
-| --- | --- |
-| Customer: Still blocked | Infer an owner and several service labels from a history of contacts. |
-| Customer: Resolved since then | A later resolution changes the current state, including an earlier request for a person. |
-| Customer: Different issues | Multiple contacts do not necessarily mean repeated contact about the same issue. |
-| PR: Small cleanup? | An incompatible API response can matter despite a harmless title. |
-| PR: Access control change | Independent security and migration labels can both apply. |
-| PR: Security in name only | Evaluate what the diff changes, including when it only changes documentation. |
+## The two examples
 
-Run once, inspect the raw answers, then move the label threshold. The labels update from the existing answers without another API call. Editing the evidence requires a new run.
+| Example | Question | Typed result |
+| --- | --- | --- |
+| Customer | What is the reason for this contact? | A `Choice`: `card_replacement`, `payment_query`, `online_banking`, or `other`. |
+| Pull request | Does this diff introduce a backward-incompatible public API change? | A `Noul`: the probability of yes, from `0` to `1`. |
 
-## Walk through these files
+Customer scenarios are **Replace a card**, **Question a charge**, and **Access the app**. Each has one intent. The chosen reason becomes the customer label directly.
+
+PR scenarios are **Rename a response field**, **Add an optional field**, and **Documentation only**. They contrast a removed contract field, a compatible addition, and words in documentation. A local comparison applies `breaking-change` when the probability meets the threshold, initially `0.8`.
+
+Changing the PR threshold reuses the existing answer without another request. Customer labels do not use that threshold. Changing the input or scenario requires a fresh run.
+
+## Walk through the code
 
 | File | What to explain |
 | --- | --- |
-| [src/examples/customer.ts](src/examples/customer.ts) | `labelCustomer`: one request, five questions. `customerLabels`: explicit threshold rules. |
-| [src/examples/pull-request.ts](src/examples/pull-request.ts) | `labelPullRequest`: the same pattern over a title and diff. `pullRequestLabels`: independent labels. |
-| [src/client.ts](src/client.ts) | SDK configuration and model selection. |
-| [src/catalog.ts](src/catalog.ts) | The fictional inputs and preset cases. |
-| [src/recordings.json](src/recordings.json) | Captured API responses used by recorded mode. |
+| [src/examples/customer.ts](src/examples/customer.ts) | `labelCustomer`: state, one `choice` question, and one SDK call. |
+| [src/examples/pull-request.ts](src/examples/pull-request.ts) | `labelPullRequest`: one `noul` question. `pullRequestLabels`: one probability comparison. |
+| [src/client.ts](src/client.ts) | Model selection and server-side SDK configuration. |
+| [src/catalog.ts](src/catalog.ts) | The fictional inputs and scenario definitions. |
+| [src/recordings.json](src/recordings.json) | The captured results for Recorded mode. |
 
-The example files contain the SDK calls directly. Start there; the web interface is presentation scaffolding.
+Both example functions build a `request` object, pass it to `client.systemOne(request)`, and return `{ request, response }`. The **Request & response** view shows that actual SDK input, including `model`, `state`, and `questions`, alongside its response. The API key stays on the server.
 
-| Primitive | Meaning in this demo |
-| --- | --- |
-| `choice` | One owner from a fixed set, including `none`. |
-| `noul` | Probability that an individual condition holds. Several conditions can be true. |
-| `score` | Expected position on the example's ordered 0-3 rubric. |
+The SDK infers answer types from the question definitions. Inspect `response.answers.reason.choice` for the customer and `response.answers.breakingChange.noul` for the PR. See the [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) and [primitives](https://docs.typesafe.ai/primitives).
 
-Questions in a request share the input and are evaluated independently; they cannot read one another's answers. The SDK infers answer types from the question definitions. See the [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) and [primitives](https://docs.typesafe.ai/primitives).
+A Noul near `0.5` means uncertainty, not a moderately breaking change. Choice confidence summarizes concentration of the option probabilities, not guaranteed correctness. The PR's `0.8` threshold is illustrative and needs evaluation for a real workflow. See [confidence](https://docs.typesafe.ai/confidence).
 
-A Noul of `0.5` signals uncertainty, not medium severity. A Score is a rubric position, not a probability. Choice and Score confidence describes concentration of their answer distributions, not guaranteed correctness. The default `0.8` label threshold is an illustration, not a threshold calibrated to bank policy. See [confidence](https://docs.typesafe.ai/confidence).
+## How does Jev differ from a generative LLM?
+
+TypeSafe calls Jev a **System One** model and describes its training focus as calibrated decisions.
+
+| | Jev | A generative LLM |
+| --- | --- | --- |
+| Intended job | Focused judgments over supplied evidence. | Generation, explanation, and open-ended reasoning. |
+| Interface | Choice, Noul, and Score, with answer probabilities. | Content; many APIs also support structured output and tools. |
+| Application code | Consumes typed judgments and controls what happens next. | Can also enforce typed outputs and orchestrate a workflow. |
+
+General LLMs can classify and provide probability information too. Jev's distinction is its specialization and decision interface. This demo uses Choice and Noul; Score is another primitive, outside the walkthrough. It does not benchmark models or establish a speed or cost advantage. See [System One](https://docs.typesafe.ai/concepts/system-one).
 
 ## Terminal and maintenance
 
 ```sh
 bun demo customer 1
-bun demo customer 2
 bun demo pull-request 1
+bun demo pull-request 2
 ```
 
-The terminal commands make live requests and print the answers and derived labels. Preset numbers are `1`, `2`, or `3` for either example.
+The terminal commands make live requests. Scenario numbers are `1`, `2`, or `3` for either example.
 
 | Command | Purpose |
 | --- | --- |
 | `bun dev` | Start the demo with automatic reload. |
-| `bun run record` | Call the API for all six presets and replace the saved recordings. |
+| `bun run record` | Call the API for all six scenarios and replace the saved recordings. |
 | `bun run check` | Check types and code style. |
-| `bun test` | Test batching, label rules, replay, validation, and error handling without an API key. |
+| `bun test` | Run the local tests without an API key. |
 | `bun run build` | Verify the browser bundle. |
 | `bun start` | Run the Bun server in production mode. |
 
-A build is not required before starting the server. Refresh recordings after changing the questions or presets, then rehearse the outputs before presenting. Live probabilities and latency can vary; a recording is a captured result, not an accuracy or performance benchmark.
+A build is not required before starting the server. Refresh recordings after changing the questions or scenarios, then rehearse before presenting. Live probabilities and elapsed times can vary.
 
-All fixtures are fictional. Live mode sends the selected inputs to TypeSafe. The demo does not connect to bank systems or apply labels on GitHub; it labels support needs and code changes, not customer worth, creditworthiness, or fraud propensity.
+All fixtures are fictional. Live mode sends the selected inputs to TypeSafe. The demo does not connect to bank systems or apply GitHub labels. Customer labels describe contact reasons, not customer eligibility or risk.

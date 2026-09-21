@@ -1,84 +1,77 @@
 # A 15-minute Jev walkthrough
 
-The point to land: **a small model judgment can become an ordinary typed value in a program.** The example code is the centre of the demo.
+Two examples, one question each. Show the input, run the question, inspect the request and response, then read the small function that connects them.
 
 ## Before the room
 
 - Run `bun install`, configure `.env`, and start `bun dev`.
-- Open [localhost:3000](http://localhost:3000). Rehearse the three primary presets below in Live mode and inspect their raw answers.
-- Check Recorded mode too. It replays actual captured API responses for the presets, with model and capture time shown.
-- Have `src/examples/customer.ts` and `src/examples/pull-request.ts` open in your editor. Increase the font size enough to read from the back of the room.
-- Keep a terminal ready. The commands at the end cover a browser failure; Recorded mode covers an unavailable API.
+- Open [localhost:3000](http://localhost:3000). Rehearse **Replace a card**, **Rename a response field**, and **Add an optional field** in Live mode.
+- Check Recorded mode too. It shows actual saved API results with their model and capture time.
+- Open `src/examples/customer.ts` and `src/examples/pull-request.ts` in your editor. Increase the font size for the room.
+- Keep a terminal ready using the commands at the end.
 
 ## The two-minute introduction
 
-“Jev is a specialized language model for small, focused decisions. TypeSafe calls this System One and describes its training focus as calibrated decisions. Let's compare the interface with the generative LLMs we already use.”
+“Jev is a specialized language model for focused decisions. TypeSafe calls this System One and describes its training focus as calibrated decisions. Here's how the interface compares with a generative LLM.”
 
 | | Jev | A generative LLM |
 | --- | --- | --- |
-| Intended job | Bounded judgments over supplied evidence. | Generation, explanation, and open-ended reasoning. |
-| Result | Choice, Noul, or Score, with answer probabilities. | Content, often with structured output and tool support. |
-| Workflow | Independent questions in one call; code combines answers. | Code can also orchestrate calls and enforce typed outputs. |
+| Intended job | A bounded judgment about supplied evidence. | Generation, explanation, and open-ended reasoning. |
+| Result | A Choice, Noul, or Score with answer probabilities. | Content, often with structured output and tool support. |
+| Our code | Uses those values to decide what happens next. | Can also enforce typed outputs and control a workflow. |
 
-“Structured output, probability information, and code orchestration are not unique to Jev. The interesting part is the specialization: focused questions and distributions are the primary API. We'll use those values directly. We are not measuring this against an LLM today.”
+“Structured output, probability information, and code orchestration are not unique to Jev. The distinction is specialization: focused questions and distributions are the primary API. We'll look at two tiny examples, using Choice and Noul.”
 
-Avoid claims about different neural architectures or unmeasured speed and cost. The displayed elapsed time measures this Jev request only. [System One](https://docs.typesafe.ai/concepts/system-one) describes the intended model role.
+This is an interface demonstration, not a model benchmark. Avoid claims about different neural architectures or unmeasured speed and cost. See [System One](https://docs.typesafe.ai/concepts/system-one).
 
 ## Run of show
 
 | Time | Show | Say or do |
 | --- | --- | --- |
-| 0:00-2:00 | Introduction above | Set up the comparison, then introduce the fictional support history: “We want an owner and a few current service labels.” |
-| 2:00-4:00 | **Still blocked**, Live mode | Read the short history, ask the room which labels they expect, then run once. Compare owner, label probabilities, and the friction score with the evidence. |
-| 4:00-7:00 | `src/examples/customer.ts` | Walk through state, questions, and returned answers in `labelCustomer`. Explain the three primitive types below. Five independent questions share one request. |
-| 7:00-9:00 | `customerLabels`, then the threshold control | Show the small filter that turns probabilities into labels. Move the threshold across an observed probability and watch a label change. The model is not called again. |
-| 9:00-10:00 | **Resolved since then** | Read the newer resolution and run. Compare current service needs with the earlier case. The intended distinction is that an old problem and request for a person no longer describe an active need. Discuss the actual output if it disagrees. |
-| 10:00-12:00 | PR **Small cleanup?**, then `src/examples/pull-request.ts` | Inspect the actual response-shape change and run. Walk through `labelPullRequest` and `pullRequestLabels`. It is the same programming pattern with different evidence and questions. |
-| 12:00-14:00 | Raw response and the example code | Address the likely engineering questions below. If time permits, let someone edit one input and predict what changes before rerunning. |
-| 14:00-15:00 | Questions | “The useful unit here is a typed judgment. We can test and change the rules that consume it.” Leave time for one question. |
+| 0:00-2:00 | **Jev vs LLM** | Give the introduction above. Establish that both examples ask one question. |
+| 2:00-4:00 | Customer **Replace a card**, **Demo** | Read the fictional contact. Ask which reason the audience expects, then **Run example**. Inspect the selected reason and option probabilities. |
+| 4:00-6:00 | Customer **Source** | Read `labelCustomer` in order: evidence, one `choice` question, available reasons, and the SDK call. Show the inferred answer type. |
+| 6:00-8:00 | **Request & response** | Point to `model`, `state.interactions`, and `questions.reason`. Find `response.answers.reason.choice` and its probabilities. This is the actual request object passed to the SDK, alongside the returned response. |
+| 8:00-10:00 | PR **Rename a response field**, then **Add an optional field** | Inspect the diff before running each. Removing `name` changes the existing contract; adding `avatarUrl` retains it. Compare the returned yes probabilities. |
+| 10:00-12:00 | PR **Source** | Read the single `breakingChange` question and its yes/no criteria. Show `pullRequestLabels`: a probability comparison produces `breaking-change` or no label. |
+| 12:00-13:00 | PR threshold | Move the threshold. This reuses the answer; no inference runs again. Clear cases may keep the same label across the available range. |
+| 13:00-15:00 | Questions | “We supplied evidence, asked one focused question, and used the typed result in ordinary code.” Take questions. |
 
-## The code explanation
+## Keep the code explanation small
 
-Use `labelCustomer` as the main walkthrough, in this order:
+For the customer example, follow four steps:
 
-1. **State:** `interactions` is the evidence. The request contains the history needed to interpret the current situation.
-2. **Choice:** `owner` selects one option, including `none` when nothing remains to route.
-3. **Nouls:** `unresolved`, `repeatContact`, and `wantsHuman` are separate yes/no judgments. Multiple labels may apply.
-4. **Score:** `friction` uses four defined levels from `0` to `3`; its value can sit between levels.
-5. **Composition:** `customerLabels` compares the returned probabilities with a threshold. This rule is local TypeScript.
+1. `state` contains the contact to classify.
+2. `choice` defines one question and four allowed reasons, including `other`.
+3. `client.systemOne(request)` returns an answer whose type follows those options.
+4. `response.answers.reason.choice` is the displayed label. There is no customer threshold rule.
 
-Show an inferred answer type in the editor if convenient. No generated prose needs to be parsed into the domain values. Each question must be understandable from the state and its own instructions; another question's answer is not input to it. The [primitives documentation](https://docs.typesafe.ai/primitives) explains this contract.
+For the PR, change only the concept being introduced: `noul` answers whether the supplied diff breaks the public contract. `response.answers.breakingChange.noul` feeds a simple threshold comparison.
 
-Keep `src/client.ts` to a brief glance for model and server-side configuration. Spend the code time on the two example files, not the interface or server setup.
+Both functions return `{ request, response }`, so the workbench can show what went in and what came back. The API key is server-side and is not part of the displayed request object. The [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) documents the call.
+
+Keep server setup and interface code out of the walkthrough. Score and batching exist, but are optional discussion topics after the two examples.
 
 ## Questions to be ready for
 
-- **“Is `0.8` an 80% severity?”** A Noul is the probability of yes for its question. Around `0.5` means uncertainty. Severity or degree belongs in a Score with a defined rubric.
-- **“What does confidence guarantee?”** Choice and Score confidence summarizes how concentrated their distributions are. It does not prove the judgment is correct. Thresholds need evaluation on representative cases. See [confidence](https://docs.typesafe.ai/confidence).
-- **“Could we do this with another model?”** Yes. The feature to inspect here is the interface: focused questions, inferred answer types, probabilities, and application rules that can reuse those answers.
-- **“What would we test?”** Test the deterministic label rules normally. Evaluate model judgments separately against labelled examples, especially resolutions, ambiguous histories, and irrelevant wording.
-- **“Why one request?”** These questions use the same evidence and do not depend on one another's answers. A later question that needs new evidence based on an earlier answer would need a further request.
-
-This demo concerns service needs and code changes. A banking deployment would need domain evaluation and approved data handling; the demo uses fictional inputs and makes no decisions about customer eligibility.
+- **“Is `0.5` a moderately breaking change?”** No. A Noul near `0.5` means uncertainty about yes versus no. It does not measure severity.
+- **“What does Choice confidence tell us?”** It summarizes how concentrated the option probabilities are. It does not prove the answer correct. See [confidence](https://docs.typesafe.ai/confidence).
+- **“Why `0.8`?”** It is an illustrative PR label threshold. Choose a real threshold using labelled examples and the consequences of errors.
+- **“Could another LLM do this?”** Yes. We are inspecting Jev's specialized decision interface, not claiming classification is unique to it.
+- **“What would we test?”** Test the deterministic threshold rule normally. Evaluate the model separately using labelled contacts and diffs.
 
 ## If something goes wrong
 
-**API unavailable:** select Recorded mode and the same preset. Say: “This is a saved response from the API, captured at the time shown.” You can still inspect the source, raw answers, and local threshold behaviour. Edited inputs need a live request.
+**API unavailable:** select Recorded mode and the same scenario. Say: “This is an actual API result saved at the time shown.” You can still inspect the source, request, response, and PR threshold. Edited inputs need a live request.
 
-**Browser unavailable:** run the live terminal path:
+**Browser unavailable:** use the live terminal path:
 
 ```sh
 bun demo customer 1
-bun demo customer 2
 bun demo pull-request 1
+bun demo pull-request 2
 ```
 
-**Unexpected judgment:** leave it visible. Compare the exact evidence and question with the answer. Treat it as a useful evaluation case; do not call a prediction correct just because it matches the intended story.
+**Unexpected judgment:** keep it visible. Compare the input and question with the result. Treat it as an evaluation case, rather than changing the story to call it correct.
 
-## Optional swaps, not extra agenda
-
-- **Different issues:** show why several contacts need not mean a repeat of the same unresolved issue.
-- **Access control change:** show that security and migration labels can both apply.
-- **Security in name only:** show that a documentation-only diff can contain alarming words without changing executable behaviour.
-
-Use one of these instead of an existing case if it suits the audience. Keep the demo inside 15 minutes.
+The other scenarios are optional swaps: **Question a charge**, **Access the app**, and PR **Documentation only**. The last demonstrates that mentioning breaking changes in docs does not itself alter an API contract. Keep the primary walkthrough inside 15 minutes.

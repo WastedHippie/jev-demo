@@ -1,6 +1,5 @@
-import { presets } from "@/catalog";
+import { inputSchema, presets } from "@/catalog";
 import { createClient } from "@/client";
-import { customerLabels } from "@/examples/customer";
 import { pullRequestLabels } from "@/examples/pull-request";
 import { runDemo } from "@/run";
 
@@ -18,15 +17,18 @@ if (!preset) {
 
 try {
   const started = performance.now();
-  const result = await runDemo(createClient(), preset.input);
+  const result = await runDemo(createClient(), inputSchema.parse(preset.input));
   const labels =
     result.demo === "customer"
-      ? customerLabels(result.response.answers)
+      ? [result.response.answers.reason.choice]
       : pullRequestLabels(result.response.answers);
 
   console.log(`${preset.label}\n`);
+  console.log("POST https://api.typesafe.ai/v1/systemone");
+  console.log(JSON.stringify(result.request, null, 2));
+  console.log("\nResponse:");
   console.log(JSON.stringify(result.response, null, 2));
-  console.log("\nLabels:", labels.map(({ label }) => label).join(", ") || "None");
+  console.log("\nLabels:", labels.join(", ") || "None");
   console.log(`${result.response.model} | ${Math.round(performance.now() - started)} ms`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : "The Jev request failed.");

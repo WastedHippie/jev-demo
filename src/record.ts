@@ -1,4 +1,4 @@
-import { presets } from "@/catalog";
+import { inputSchema, presets } from "@/catalog";
 import { createClient } from "@/client";
 import { type Recording, runDemo } from "@/run";
 
@@ -7,9 +7,10 @@ const recordings: Recording[] = [];
 
 for (const { label, input } of Object.values(presets).flat()) {
   const started = performance.now();
-  const result = await runDemo(client, input);
+  const normalizedInput = inputSchema.parse(input);
+  const result = await runDemo(client, normalizedInput);
   recordings.push({
-    input,
+    input: normalizedInput,
     result: {
       ...result,
       source: "recorded",

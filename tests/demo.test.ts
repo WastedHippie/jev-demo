@@ -1,8 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, expectTypeOf, test } from "bun:test";
 import { type SystemOneRequestPayload, TypeSafeClient } from "@typesafe-ai/sdk";
 import { handleRun } from "@/api";
 import { type DemoInput, runSchema } from "@/catalog";
-import { customerLabels } from "@/examples/customer";
+import type { CustomerResponse } from "@/examples/customer";
 import { pullRequestLabels } from "@/examples/pull-request";
 import savedRecordings from "@/recordings.json";
 import { type Recording, runDemo } from "@/run";
@@ -14,6 +14,7 @@ if (customer?.result.demo !== "customer" || pullRequest?.result.demo !== "pull-r
   throw new Error("The demo needs a recording of each example.");
 }
 const customerResponse = customer.result.response;
+const customerRequest = customer.result.request;
 const pullRequestResponse = pullRequest.result.response;
 
 function sdkReturning(body: unknown, status = 200) {
@@ -38,31 +39,34 @@ function request(body: unknown, origin?: string) {
   });
 }
 
-describe("batched model requests", () => {
-  test("customer labels ask independent questions over the same interaction log", async () => {
+describe("model requests", () => {
+  test("customer classification sends one Choice and exposes the exact request", async () => {
     const { client, requests } = sdkReturning(customerResponse);
     const input: DemoInput = {
       demo: "customer",
-      interactions: "A synthetic customer called twice.",
+      interactions: "My card is damaged. Please send a replacement.",
     };
 
     const result = await runDemo(client, input);
 
     expect(requests).toHaveLength(1);
+    expect(requests[0]).toEqual(result.request);
+    expect(Object.keys(result.request.questions)).toEqual(["reason"]);
     expect(requests[0]).toMatchObject({
+      model: client.defaultModel,
       state: { interactions: input.interactions },
-      questions: {
-        owner: { type: "choice" },
-        unresolved: { type: "noul" },
-        repeatContact: { type: "noul" },
-        wantsHuman: { type: "noul" },
-        friction: { type: "score" },
-      },
+      questions: { reason: { type: "choice" } },
     });
-    expect(result).toEqual({ demo: "customer", response: customerResponse });
+    expect(result).toMatchObject({ demo: "customer", response: customerResponse });
+    expectTypeOf<CustomerResponse["answers"]["reason"]["choice"]>().toEqualTypeOf<
+      "card_replacement" | "payment_query" | "online_banking" | "other"
+    >();
+    expect(customerRequest.questions.reason.criteria).toHaveProperty(
+      customerResponse.answers.reason.choice,
+    );
   });
 
-  test("PR labels inspect title and diff together in one request", async () => {
+  test("PR classification sends one Noul and exposes the exact request", async () => {
     const { client, requests } = sdkReturning(pullRequestResponse);
     const input: DemoInput = {
       demo: "pull-request",
@@ -73,50 +77,26 @@ describe("batched model requests", () => {
     const result = await runDemo(client, input);
 
     expect(requests).toHaveLength(1);
+    expect(requests[0]).toEqual(result.request);
+    expect(Object.keys(result.request.questions)).toEqual(["breakingChange"]);
     expect(requests[0]).toMatchObject({
+      model: client.defaultModel,
       state: { title: input.title, diff: input.diff },
-      questions: {
-        breaking: { type: "noul" },
-        security: { type: "noul" },
-        migration: { type: "noul" },
-        blastRadius: { type: "score" },
-      },
+      questions: { breakingChange: { type: "noul" } },
     });
-    expect(result).toEqual({ demo: "pull-request", response: pullRequestResponse });
+    expect(result).toMatchObject({ demo: "pull-request", response: pullRequestResponse });
   });
 });
 
 describe("label policy", () => {
-  test("customer labels include the threshold, allow multiple matches, and can all be withheld", () => {
+  test("the PR label uses an inclusive, adjustable probability threshold", () => {
     const answers = {
-      ...customerResponse.answers,
-      unresolved: { type: "noul", noul: 0.8 } as const,
-      repeatContact: { type: "noul", noul: 0.79 } as const,
-      wantsHuman: { type: "noul", noul: 0.85 } as const,
+      breakingChange: { type: "noul", noul: 0.8 } as const,
     };
 
-    expect(customerLabels(answers)).toEqual([
-      { label: "Unresolved issue", probability: 0.8 },
-      { label: "Human requested", probability: 0.85 },
-    ]);
-    expect(customerLabels(answers, 0.75)).toHaveLength(3);
-    expect(customerLabels(answers, 0.9)).toEqual([]);
-  });
-
-  test("PR labels are independent, with an adjustable inclusive threshold", () => {
-    const answers = {
-      ...pullRequestResponse.answers,
-      breaking: { type: "noul", noul: 0.81 } as const,
-      security: { type: "noul", noul: 0.8 } as const,
-      migration: { type: "noul", noul: 0.1 } as const,
-    };
-
-    expect(pullRequestLabels(answers)).toEqual([
-      { label: "breaking-change", probability: 0.81 },
-      { label: "security-sensitive", probability: 0.8 },
-    ]);
-    expect(pullRequestLabels(answers, 0.1)).toHaveLength(3);
-    expect(pullRequestLabels(answers, 0.82)).toEqual([]);
+    expect(pullRequestLabels(answers)).toEqual(["breaking-change"]);
+    expect(pullRequestLabels(answers, 0.79)).toEqual(["breaking-change"]);
+    expect(pullRequestLabels(answers, 0.81)).toEqual([]);
   });
 });
 
@@ -138,11 +118,15 @@ describe("run endpoint", () => {
     expect(response.status).toBe(503);
   });
 
-  test("live success is marked as live and keeps the typed answers", async () => {
+  test("live success includes the actual request, typed answers, and live source", async () => {
     const { client, requests } = sdkReturning(customerResponse);
     const response = await handleRun(request({ mode: "live", input: customer.input }), client);
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ source: "live", response: customerResponse });
+    expect(await response.json()).toMatchObject({
+      source: "live",
+      request: requests[0],
+      response: customerResponse,
+    });
     expect(requests).toHaveLength(1);
   });
 

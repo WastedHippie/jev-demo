@@ -6,11 +6,11 @@ import { labelPullRequest } from "@/examples/pull-request";
 export async function runDemo(client: TypeSafeClient, input: DemoInput) {
   switch (input.demo) {
     case "customer":
-      return { demo: input.demo, response: await labelCustomer(client, input.interactions) };
+      return { demo: input.demo, ...(await labelCustomer(client, input.interactions)) };
     case "pull-request":
       return {
         demo: input.demo,
-        response: await labelPullRequest(client, input.title, input.diff),
+        ...(await labelPullRequest(client, input.title, input.diff)),
       };
   }
 }
