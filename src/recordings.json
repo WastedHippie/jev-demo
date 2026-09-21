@@ -1,0 +1,338 @@
+[
+  {
+    "input": {
+      "demo": "customer",
+      "interactions": "Monday, 09:10 | Customer\nI can't sign into the mobile app. It says my device isn't recognised.\n\nMonday, 09:18 | Support\nPlease reinstall the app and register your device again.\n\nTuesday, 12:30 | Customer\nI've reinstalled twice and tried registering again. Still the same error. I need to make a transfer today.\n\nWednesday, 08:45 | Customer\nThis is my third time contacting you about this. I'm still locked out. Can someone please call me instead of sending the same steps?"
+    },
+    "result": {
+      "demo": "customer",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "owner": {
+            "type": "choice",
+            "choice": "digital_banking",
+            "confidence": 1,
+            "probabilities": {
+              "digital_banking": 1,
+              "account_support": 0,
+              "payments": 0,
+              "none": 0
+            }
+          },
+          "unresolved": {
+            "type": "noul",
+            "noul": 0.98
+          },
+          "repeatContact": {
+            "type": "noul",
+            "noul": 0.99
+          },
+          "wantsHuman": {
+            "type": "noul",
+            "noul": 0.97
+          },
+          "friction": {
+            "type": "score",
+            "score": 3,
+            "confidence": 1,
+            "legend": {
+              "0": "A routine interaction with no problem to resolve",
+              "1": "A first support contact or one straightforward step, without repeated failed attempts",
+              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
+              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
+            },
+            "probabilities": {
+              "0": 0,
+              "1": 0,
+              "2": 0,
+              "3": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 716,
+          "output_tokens": 126
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 904,
+      "capturedAt": "2026-09-21T00:10:10.198Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "customer",
+      "interactions": "Monday, 09:10 | Customer\nI can't sign into the mobile app. Can someone call me?\n\nTuesday, 12:30 | Customer\nI'm following up. Reinstalling didn't fix it.\n\nTuesday, 14:00 | Support\nI called the customer, reset their device registration and stayed on the phone while they signed in successfully.\n\nTuesday, 14:10 | Customer\nThanks for the call! I'm back in and the transfer went through. All sorted now."
+    },
+    "result": {
+      "demo": "customer",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "owner": {
+            "type": "choice",
+            "choice": "none",
+            "confidence": 0.98,
+            "probabilities": {
+              "digital_banking": 0.02,
+              "account_support": 0,
+              "payments": 0,
+              "none": 0.98
+            }
+          },
+          "unresolved": {
+            "type": "noul",
+            "noul": 0.02
+          },
+          "repeatContact": {
+            "type": "noul",
+            "noul": 0.98
+          },
+          "wantsHuman": {
+            "type": "noul",
+            "noul": 0.04
+          },
+          "friction": {
+            "type": "score",
+            "score": 1.99,
+            "confidence": 0.99,
+            "legend": {
+              "0": "A routine interaction with no problem to resolve",
+              "1": "A first support contact or one straightforward step, without repeated failed attempts",
+              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
+              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
+            },
+            "probabilities": {
+              "0": 0,
+              "1": 0.01,
+              "2": 0.99,
+              "3": 0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 704,
+          "output_tokens": 123
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 317,
+      "capturedAt": "2026-09-21T00:10:10.515Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "customer",
+      "interactions": "Monday | Customer\nWhere can I download last month's statement?\n\nMonday | Support\nOpen Accounts, then Statements, and choose the month.\n\nMonday | Customer\nFound it, thanks.\n\nFriday | Customer\nA new question: I see the same card purchase twice in my settled transactions. Could you check the duplicate charge?"
+    },
+    "result": {
+      "demo": "customer",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "owner": {
+            "type": "choice",
+            "choice": "payments",
+            "confidence": 1,
+            "probabilities": {
+              "payments": 1,
+              "digital_banking": 0,
+              "account_support": 0,
+              "none": 0
+            }
+          },
+          "unresolved": {
+            "type": "noul",
+            "noul": 0.95
+          },
+          "repeatContact": {
+            "type": "noul",
+            "noul": 0.06
+          },
+          "wantsHuman": {
+            "type": "noul",
+            "noul": 0.03
+          },
+          "friction": {
+            "type": "score",
+            "score": 1.03,
+            "confidence": 0.94,
+            "legend": {
+              "0": "A routine interaction with no problem to resolve",
+              "1": "A first support contact or one straightforward step, without repeated failed attempts",
+              "2": "Several contacts or troubleshooting steps, with progress or a usable workaround",
+              "3": "Repeated contacts and unsuccessful steps, with the customer still blocked"
+            },
+            "probabilities": {
+              "0": 0.02,
+              "1": 0.94,
+              "2": 0.03,
+              "3": 0.01
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 657,
+          "output_tokens": 123
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 290,
+      "capturedAt": "2026-09-21T00:10:10.805Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Small cleanup of the transfers endpoint",
+      "diff": "diff --git a/src/api/transfers.ts b/src/api/transfers.ts\n--- a/src/api/transfers.ts\n+++ b/src/api/transfers.ts\n@@ -12,6 +12,5 @@ export function transferResponse(transfer: Transfer) {\n   return {\n     id: transfer.id,\n-    amount: transfer.amountInCents,\n-    currency: transfer.currency,\n+    amount: { value: transfer.amountInCents, currency: transfer.currency },\n   };\n }"
+    },
+    "result": {
+      "demo": "pull-request",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breaking": {
+            "type": "noul",
+            "noul": 0.95
+          },
+          "security": {
+            "type": "noul",
+            "noul": 0.05
+          },
+          "migration": {
+            "type": "noul",
+            "noul": 0.06
+          },
+          "blastRadius": {
+            "type": "score",
+            "score": 2,
+            "confidence": 0.99,
+            "legend": {
+              "0": "No executable behavior changes; documentation, comments, or tests only",
+              "1": "A local optional feature or isolated presentation behavior",
+              "2": "A core feature or public endpoint used by a subset of workflows",
+              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
+            },
+            "probabilities": {
+              "0": 0,
+              "1": 0,
+              "2": 0.99,
+              "3": 0.01
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 668,
+          "output_tokens": 67
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 391,
+      "capturedAt": "2026-09-21T00:10:11.197Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Simplify account access checks",
+      "diff": "diff --git a/src/middleware/authorize.ts b/src/middleware/authorize.ts\n--- a/src/middleware/authorize.ts\n+++ b/src/middleware/authorize.ts\n@@ -4,5 +4,4 @@ export async function authorizeAccount(req: Request) {\n   const session = await requireSession(req);\n-  const membership = await findAccountMember(req.params.accountId, session.userId);\n-  if (!membership) throw new ForbiddenError();\n+  if (!session.userId) throw new ForbiddenError();\n   return session;\n }\ndiff --git a/migrations/042_members.sql b/migrations/042_members.sql\nnew file mode 100644\n--- /dev/null\n+++ b/migrations/042_members.sql\n@@ -0,0 +1,2 @@\n+ALTER TABLE account_members ADD COLUMN role TEXT NOT NULL DEFAULT 'viewer';\n+UPDATE account_members SET role = 'owner' WHERE is_owner = TRUE;"
+    },
+    "result": {
+      "demo": "pull-request",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breaking": {
+            "type": "noul",
+            "noul": 0.54
+          },
+          "security": {
+            "type": "noul",
+            "noul": 0.96
+          },
+          "migration": {
+            "type": "noul",
+            "noul": 0.97
+          },
+          "blastRadius": {
+            "type": "score",
+            "score": 2.99,
+            "confidence": 0.99,
+            "legend": {
+              "0": "No executable behavior changes; documentation, comments, or tests only",
+              "1": "A local optional feature or isolated presentation behavior",
+              "2": "A core feature or public endpoint used by a subset of workflows",
+              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
+            },
+            "probabilities": {
+              "0": 0,
+              "1": 0,
+              "2": 0.01,
+              "3": 0.99
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 797,
+          "output_tokens": 67
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 328,
+      "capturedAt": "2026-09-21T00:10:11.525Z"
+    }
+  },
+  {
+    "input": {
+      "demo": "pull-request",
+      "title": "Document breaking changes, security and database migrations",
+      "diff": "diff --git a/docs/contributing.md b/docs/contributing.md\n--- a/docs/contributing.md\n+++ b/docs/contributing.md\n@@ -8,1 +8,7 @@ Pull request guidelines\n Keep changes focused.\n+\n+## Review checklist\n+Mention any breaking changes in the PR description.\n+Ask the security team to review authentication changes.\n+Include a rollback plan for database migrations.\n+Add a test for the behavior you are changing."
+    },
+    "result": {
+      "demo": "pull-request",
+      "response": {
+        "model": "jev-1.13.0",
+        "answers": {
+          "breaking": {
+            "type": "noul",
+            "noul": 0.02
+          },
+          "security": {
+            "type": "noul",
+            "noul": 0.02
+          },
+          "migration": {
+            "type": "noul",
+            "noul": 0.03
+          },
+          "blastRadius": {
+            "type": "score",
+            "score": 0,
+            "confidence": 1,
+            "legend": {
+              "0": "No executable behavior changes; documentation, comments, or tests only",
+              "1": "A local optional feature or isolated presentation behavior",
+              "2": "A core feature or public endpoint used by a subset of workflows",
+              "3": "Cross-cutting authentication, authorization, or transaction integrity across workflows"
+            },
+            "probabilities": {
+              "0": 1,
+              "1": 0,
+              "2": 0,
+              "3": 0
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 659,
+          "output_tokens": 67
+        }
+      },
+      "source": "recorded",
+      "elapsedMs": 455,
+      "capturedAt": "2026-09-21T00:10:11.979Z"
+    }
+  }
+]
