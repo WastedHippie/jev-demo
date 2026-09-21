@@ -1,0 +1,57 @@
+.diff-field {
+  min-width: 0;
+}
+.diff-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+}
+.diff-heading button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.diff-preview {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 220px;
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: 13px / 1.65 var(--mono);
+  background: #fff;
+}
+.diff-preview code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  padding: 8px 0;
+}
+.diff-preview pre {
+  margin: 0;
+  font: inherit;
+}
+.diff-line {
+  display: block;
+  padding: 0 12px;
+  min-height: 1.65em;
+}
+.diff-metadata {
+  color: var(--muted);
+  background: var(--subtle);
+}
+.diff-hunk {
+  color: #0550ae;
+  background: #ddf4ff;
+}
+.diff-addition {
+  color: #116329;
+  background: #dafbe1;
+}
+.diff-removal {
+  color: #82071e;
+  background: #ffebe9;
+}

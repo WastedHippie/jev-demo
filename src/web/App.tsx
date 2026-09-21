@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { type DemoId, type Mode, presets } from "@/catalog";
+import { type DemoId, type DemoInput, type Mode, presets } from "@/catalog";
 import { CodeWalkthrough } from "@/web/CodeWalkthrough";
 import { Comparison } from "@/web/Comparison";
 import { InputPanel } from "@/web/InputPanel";
+import { RequestResponse } from "@/web/RequestResponse";
 import { Results } from "@/web/Results";
 import { useDemo } from "@/web/useDemo";
 
@@ -13,12 +14,17 @@ const examples: { id: DemoId; name: string }[] = [
 
 export function App() {
   const demo = useDemo();
-  const [view, setView] = useState<"demo" | "source" | "about">("demo");
+  const [view, setView] = useState<"demo" | "request" | "source" | "about">("demo");
   const [threshold, setThreshold] = useState(0.8);
+
+  function changeInput(input: DemoInput) {
+    setThreshold(0.8);
+    demo.changeInput(input);
+  }
 
   function selectExample(id: DemoId) {
     const preset = presets[id][0];
-    if (preset) demo.changeInput(preset.input);
+    if (preset) changeInput(preset.input);
     setThreshold(0.8);
   }
 
@@ -49,6 +55,13 @@ export function App() {
           <button type="button" aria-pressed={view === "demo"} onClick={() => setView("demo")}>
             Demo
           </button>
+          <button
+            type="button"
+            aria-pressed={view === "request"}
+            onClick={() => setView("request")}
+          >
+            Request / response
+          </button>
           <button type="button" aria-pressed={view === "source"} onClick={() => setView("source")}>
             Source
           </button>
@@ -60,14 +73,17 @@ export function App() {
 
       <div className="session-bar">
         <code>{demo.config?.model ?? "Loading configuration…"}</code>
-        <span>{demo.input.demo === "customer" ? "5" : "4"} questions per request</span>
+        <span>One question per request</span>
         <label htmlFor="mode">
           Mode{" "}
           <select
             id="mode"
             value={demo.mode}
             disabled={!demo.config}
-            onChange={(event) => demo.changeMode(event.target.value as Mode)}
+            onChange={(event) => {
+              setThreshold(0.8);
+              demo.changeMode(event.target.value as Mode);
+            }}
           >
             <option value="live" disabled={!demo.config?.liveAvailable}>
               Live
@@ -90,7 +106,7 @@ export function App() {
               mode={demo.mode}
               pending={demo.pending}
               ready={demo.config !== null}
-              onChange={demo.changeInput}
+              onChange={changeInput}
               onRun={() => void demo.execute()}
             />
             <Results
@@ -101,6 +117,8 @@ export function App() {
               onThresholdChange={setThreshold}
             />
           </div>
+        ) : view === "request" ? (
+          <RequestResponse result={demo.result} />
         ) : view === "source" ? (
           <CodeWalkthrough key={demo.input.demo} demo={demo.input.demo} result={demo.result} />
         ) : (

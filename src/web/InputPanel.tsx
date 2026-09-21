@@ -1,4 +1,5 @@
 import { type DemoInput, type Mode, presets } from "@/catalog";
+import { DiffInput } from "@/web/DiffInput";
 
 type Props = {
   input: DemoInput;
@@ -81,18 +82,11 @@ export function InputPanel({ input, mode, pending, ready, onChange, onRun }: Pro
                 onChange={(event) => onChange({ ...input, title: event.target.value })}
               />
             </label>
-            <label className="field" htmlFor="diff">
-              Diff
-              <textarea
-                id="diff"
-                className="diff-input"
-                value={input.diff}
-                readOnly={recorded}
-                maxLength={12000}
-                spellCheck={false}
-                onChange={(event) => onChange({ ...input, diff: event.target.value })}
-              />
-            </label>
+            <DiffInput
+              value={input.diff}
+              readOnly={recorded}
+              onChange={(diff) => onChange({ ...input, diff })}
+            />
           </>
         )}
         <p className="hint">

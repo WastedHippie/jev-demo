@@ -40,21 +40,19 @@ export function Comparison() {
           </tr>
         </tbody>
       </table>
-      <h3>The three values in this demo</h3>
+      <h3>The two values in this demo</h3>
       <ul>
         <li>
-          <code>Choice</code>: one support owner from a set, including <code>none</code>.
+          <code>Choice</code>: one reason for contact from a set, including <code>other</code>.
         </li>
         <li>
-          <code>Noul</code>: probability that one condition is true. Several labels can apply.
-        </li>
-        <li>
-          <code>Score</code>: expected position on an ordered rubric. Here, the range is 0 to 3.
+          <code>Noul</code>: probability that the PR breaks its public API contract.
         </li>
       </ul>
       <p>
-        Questions in a batch cannot read each other's answers. Code controls the threshold and what
-        to do with the results. Use a generative model when you need an explanation or a reply.
+        Each example asks one question. Jev also supports a Score primitive for ordered rubrics and
+        independent questions in a batch. Use a generative model when you need an explanation or a
+        reply.
       </p>
       <p className="hint">
         These examples are not a comparative benchmark. The time shown is the duration of this Jev

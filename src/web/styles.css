@@ -226,10 +226,10 @@ input[readonly] {
   background: var(--subtle);
 }
 .context-input {
-  height: 380px;
+  height: 240px;
 }
 .diff-input {
-  height: 308px;
+  height: 220px;
   font: 13px / 1.65 var(--mono);
   white-space: pre;
 }
@@ -295,6 +295,35 @@ td:last-child {
 }
 .label-section {
   margin-top: 28px;
+}
+.option-probabilities {
+  margin-top: 24px;
+}
+.option-probabilities dl {
+  margin: 12px 0 0;
+}
+.option-probabilities dl > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.option-probabilities dd {
+  margin: 0;
+  font-family: var(--mono);
+}
+.request-empty {
+  padding: 28px;
+  color: var(--muted);
+}
+.endpoint {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.request-json {
+  max-height: calc(100vh - 290px);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .labels {
   display: flex;
@@ -412,7 +441,7 @@ summary {
   font-size: 12px;
   line-height: 1.6;
 }
-@media (max-width: 1000px) {
+@media (max-width: 760px) {
   .pane {
     padding: 22px 20px;
   }
@@ -428,7 +457,7 @@ summary {
     border-top: 1px solid var(--border);
   }
   .context-input {
-    height: 300px;
+    height: 240px;
   }
   .source-code {
     max-height: 620px;
