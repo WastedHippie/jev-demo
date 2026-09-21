@@ -1,0 +1,32 @@
+{
+  "name": "jev-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/server.ts",
+    "start": "NODE_ENV=production bun src/server.ts",
+    "demo": "bun src/cli.ts",
+    "check": "tsc --noEmit && biome check .",
+    "format": "biome check --write .",
+    "test": "bun test",
+    "build": "bun build ./src/web/index.html --outdir=dist --minify",
+    "record": "bun src/record.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "highlight.js": "^11.12.0",
+    "lucide-react": "^1.47.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "@types/bun": "^1.4.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
