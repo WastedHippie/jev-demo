@@ -405,32 +405,6 @@ summary {
 .hljs-attr {
   color: #0550ae;
 }
-.comparison {
-  max-width: 960px;
-  padding: 36px 28px 48px;
-}
-.comparison h2 {
-  font-size: 20px;
-  margin-bottom: 18px;
-}
-.comparison p {
-  line-height: 1.7;
-  margin: 18px 0;
-  max-width: 80ch;
-}
-.comparison table {
-  margin: 24px 0;
-}
-.comparison td {
-  line-height: 1.6;
-}
-.comparison ul {
-  padding-left: 20px;
-  line-height: 1.9;
-}
-.comparison a {
-  font-size: 13px;
-}
 .footer {
   display: flex;
   flex-wrap: wrap;
@@ -495,12 +469,6 @@ summary {
   }
   .session-bar > span {
     display: none;
-  }
-  .comparison {
-    padding: 28px 18px;
-  }
-  .comparison table {
-    font-size: 12px;
   }
   .run-controls {
     gap: 10px;

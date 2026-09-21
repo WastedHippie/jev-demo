@@ -121,13 +121,25 @@ export function App() {
           <RequestResponse result={demo.result} />
         ) : view === "source" ? (
           <CodeWalkthrough key={demo.input.demo} demo={demo.input.demo} result={demo.result} />
-        ) : (
-          <Comparison />
-        )}
+        ) : null}
+        <div hidden={view !== "about"}>
+          <Comparison
+            key={`${demo.mode}:${JSON.stringify(demo.input)}`}
+            input={demo.input}
+            mode={demo.mode}
+            jevAvailable={demo.config?.liveAvailable ?? false}
+            llmAvailable={demo.config?.openaiAvailable ?? false}
+            llmModel={demo.config?.openaiModel ?? null}
+          />
+        </div>
       </main>
 
       <footer className="footer">
-        {demo.result ? (
+        {view === "about" ? (
+          <span>
+            Live comparison sends the same example to Jev and the configured OpenAI endpoint.
+          </span>
+        ) : demo.result ? (
           <>
             <span>{demo.result.source === "live" ? "Live response" : "Recorded response"}</span>
             <span>{demo.result.response.model}</span>

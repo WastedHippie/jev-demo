@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { type DemoInput, type Mode, presets } from "@/catalog";
 import type { DemoRun } from "@/run";
 
-type Config = { liveAvailable: boolean; model: string };
+type Config = {
+  liveAvailable: boolean;
+  model: string;
+  openaiAvailable: boolean;
+  openaiModel: string | null;
+};
 
 export function useDemo() {
   const [config, setConfig] = useState<Config | null>(null);
@@ -27,7 +32,12 @@ export function useDemo() {
         setMode(next.liveAvailable ? "live" : "recorded");
       } catch (cause) {
         if (controller.signal.aborted) return;
-        setConfig({ liveAvailable: false, model: "Jev" });
+        setConfig({
+          liveAvailable: false,
+          model: "Jev",
+          openaiAvailable: false,
+          openaiModel: null,
+        });
         setError(cause instanceof Error ? cause.message : "Could not connect to the demo server.");
       }
     }

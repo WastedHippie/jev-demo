@@ -1,0 +1,105 @@
+.comparison-intro {
+  padding: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.comparison-intro h2 {
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+.comparison-intro > p {
+  max-width: 95ch;
+  line-height: 1.7;
+}
+.comparison-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 24px;
+}
+.comparison-controls > div {
+  display: grid;
+  gap: 6px;
+}
+.comparison-controls strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.comparison-controls span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.comparison-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin: 0 0 28px;
+}
+.comparison-metrics dt {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.comparison-metrics dd {
+  font: 12px var(--mono);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.comparison-answer {
+  margin: 12px 0;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow: auto;
+}
+.comparison-probabilities {
+  margin-top: 20px;
+}
+.comparison-json {
+  margin-top: 20px;
+}
+.comparison-json .json-output {
+  max-height: 340px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.comparison-error {
+  margin: 24px 28px;
+}
+.comparison-docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 20px 28px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.source-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.source-selector select {
+  min-width: 0;
+  padding: 5px 8px;
+}
+.source-pane .pane-heading {
+  flex-wrap: wrap;
+}
+@media (max-width: 540px) {
+  .comparison-intro {
+    padding: 24px 18px;
+  }
+  .comparison-controls {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .comparison-docs {
+    padding: 20px 18px;
+  }
+  .comparison-error {
+    margin: 20px 18px;
+  }
+}
