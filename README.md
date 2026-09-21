@@ -5,7 +5,7 @@ A 15-minute TypeScript and Bun demo for engineers. Two small examples each ask *
 - **Customer label:** choose the reason for a fictional customer's contact.
 - **PR label:** judge whether a diff breaks a public API contract.
 
-The workbench keeps the input, actual request, response, and source available to inspect.
+The workbench exposes the input, actual request, response, and source. It can also run the same question through Jev and OpenAI via Portkey.
 
 ## Run it
 
@@ -20,9 +20,19 @@ bun dev
 
 Open [localhost:3000](http://localhost:3000). Bun loads `.env` automatically; the SDK reads the key on the server. Restart after changing the key. `.env` is ignored by Git. `TYPESAFE_MODEL` defaults to `jev-1.13.0`.
 
-Choose a scenario, then **Run example**. Use **Demo** for the input and result, **Request & response** for the JSON, **Source** for the example code, and **Jev vs LLM** for the comparison.
+For the live comparison, also set these in `.env` or the environment:
 
-**Recorded** mode uses saved results from actual API calls and works without a key. Each result identifies its mode, model, and capture time. There is no automatic fallback from a failed live call to a recording. Recordings cover the included scenarios; edited inputs require Live mode.
+| Variable | Value |
+| --- | --- |
+| `OPENAI_URL` | Portkey base URL, for example `https://api.portkey.ai/v1`. |
+| `OPENAI_MODEL` | Your configured model, including the full `@provider/model` route when used. It is passed through unchanged. |
+| `OPENAI_API_KEY` | Your Portkey API key. The server sends it as `x-portkey-api-key`. |
+
+There are no separate `PORTKEY_*` variables. Use a model route that supports strict structured outputs. Restart after changing configuration. See [Portkey's Universal API](https://portkey.ai/docs/product/ai-gateway/universal-api).
+
+Choose a scenario, then **Run example**. Use **Demo** for the input and result, **Request / response** for the JSON, **Source** to select the Jev example or OpenAI adapter, and **Jev vs LLM** to run both models. PR diffs are highlighted; **Edit diff** / **View diff** switches between editing and viewing in Live mode.
+
+**Recorded** mode replays actual Jev API results without a key. Results identify their mode, model, and capture time. There is no automatic fallback from live to recorded. Recordings cover the included scenarios; edited inputs and the two-model comparison require live requests.
 
 Start with **Replace a card**, then **Rename a response field**. The [presenter guide](docs/presenter.md) covers the 15-minute walkthrough.
 
@@ -43,29 +53,32 @@ Changing the PR threshold reuses the existing answer without another request. Cu
 
 | File | What to explain |
 | --- | --- |
-| [src/examples/customer.ts](src/examples/customer.ts) | `labelCustomer`: state, one `choice` question, and one SDK call. |
-| [src/examples/pull-request.ts](src/examples/pull-request.ts) | `labelPullRequest`: one `noul` question. `pullRequestLabels`: one probability comparison. |
+| [src/examples/customer.ts](src/examples/customer.ts) | `customerRequest`: state and one `choice` question. `labelCustomer`: the SDK call. |
+| [src/examples/pull-request.ts](src/examples/pull-request.ts) | `pullRequestRequest`: one `noul` question. `pullRequestLabels`: one probability comparison. |
+| [src/openai.ts](src/openai.ts) | Translate the same question into a strict JSON response through Portkey. |
+| [src/compare.ts](src/compare.ts) | Run both models concurrently and retain their requests, responses, and timings. |
 | [src/client.ts](src/client.ts) | Model selection and server-side SDK configuration. |
 | [src/catalog.ts](src/catalog.ts) | The fictional inputs and scenario definitions. |
 | [src/recordings.json](src/recordings.json) | The captured results for Recorded mode. |
 
-Both example functions build a `request` object, pass it to `client.systemOne(request)`, and return `{ request, response }`. The **Request & response** view shows that actual SDK input, including `model`, `state`, and `questions`, alongside its response. The API key stays on the server.
+Request builders define the evidence and questions once for both integrations. The Jev functions pass that object to `client.systemOne(request)` and return `{ request, response }`. **Request / response** shows the actual SDK input, including `model`, `state`, and `questions`, alongside its response. The API key stays on the server.
 
 The SDK infers answer types from the question definitions. Inspect `response.answers.reason.choice` for the customer and `response.answers.breakingChange.noul` for the PR. See the [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) and [primitives](https://docs.typesafe.ai/primitives).
 
 A Noul near `0.5` means uncertainty, not a moderately breaking change. Choice confidence summarizes concentration of the option probabilities, not guaranteed correctness. The PR's `0.8` threshold is illustrative and needs evaluation for a real workflow. See [confidence](https://docs.typesafe.ai/confidence).
 
-## How does Jev differ from a generative LLM?
+## Compare Jev with OpenAI
 
-TypeSafe calls Jev a **System One** model and describes its training focus as calibrated decisions.
+Select an example and scenario, open **Jev vs LLM**, then choose **Run both models**. Both live calls start concurrently with the same state, question, and criteria. Inspect each raw request, response, and elapsed time.
 
-| | Jev | A generative LLM |
+| Result | Jev | OpenAI through Portkey |
 | --- | --- | --- |
-| Intended job | Focused judgments over supplied evidence. | Generation, explanation, and open-ended reasoning. |
-| Interface | Choice, Noul, and Score, with answer probabilities. | Content; many APIs also support structured output and tools. |
-| Application code | Consumes typed judgments and controls what happens next. | Can also enforce typed outputs and orchestrate a workflow. |
+| Customer | A Choice label and native option probabilities. | Strict JSON with a `reason` enum. |
+| PR | A Noul probability, which the application thresholds. | Strict JSON with a `breakingChange` boolean. |
 
-General LLMs can classify and provide probability information too. Jev's distinction is its specialization and decision interface. This demo uses Choice and Noul; Score is another primitive, outside the walkthrough. It does not benchmark models or establish a speed or cost advantage. See [System One](https://docs.typesafe.ai/concepts/system-one).
+The OpenAI adapter uses [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs), so both sides return constrained values. It does not request or invent an OpenAI confidence score. Jev specializes in decisions with native probabilities; generative LLMs can also classify, use structured outputs, and perform broader generation and reasoning. See [System One](https://docs.typesafe.ai/concepts/system-one).
+
+Timing includes network and gateway overhead. A single run is not a benchmark or evidence of a general speed, cost, or accuracy advantage.
 
 ## Terminal and maintenance
 
@@ -88,4 +101,4 @@ The terminal commands make live requests. Scenario numbers are `1`, `2`, or `3` 
 
 A build is not required before starting the server. Refresh recordings after changing the questions or scenarios, then rehearse before presenting. Live probabilities and elapsed times can vary.
 
-All fixtures are fictional. Live mode sends the selected inputs to TypeSafe. The demo does not connect to bank systems or apply GitHub labels. Customer labels describe contact reasons, not customer eligibility or risk.
+All fixtures are fictional. Live Jev requests send inputs to TypeSafe; the comparison also sends them through Portkey to the configured model. Keys stay on the server. The demo does not connect to bank systems or apply GitHub labels. Customer labels describe contact reasons, not eligibility or risk.
